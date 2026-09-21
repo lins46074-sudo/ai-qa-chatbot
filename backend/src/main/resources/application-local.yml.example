@@ -1,0 +1,31 @@
+# =====================================================================
+# 本地开发配置模板（可选）
+#
+# 使用方式：
+#   1. 复制本文件为同目录下的 application-local.yml（该文件已被 .gitignore 忽略）
+#   2. 填入你的真实配置
+#   3. 以 local profile 启动：mvn spring-boot:run -Dspring-boot.run.profiles=local
+#      或在 IDEA 的 Run Configuration 中设置 Active profiles = local
+#
+# 说明：本文件只覆盖需要本地化的配置项，其余仍走 application.yml 的环境变量默认值。
+# =====================================================================
+spring:
+  datasource:
+    username: root
+    password: 你的MySQL密码
+
+aidoc:
+  jwt:
+    # 长度必须 >= 32 字符，可用 `openssl rand -base64 48` 生成
+    secret: 本地开发用的随机密钥至少32字符请勿用于生产环境
+
+  llm:
+    base-url: https://api.deepseek.com/v1
+    model: deepseek-chat
+    api-key: sk-你的大模型APIKey
+
+    # 向量化：留空则使用本地 TF-IDF 兜底
+    embedding:
+      base-url:
+      api-key:
+      model: text-embedding-v3

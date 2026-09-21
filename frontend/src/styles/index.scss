@@ -1,0 +1,102 @@
+/* =====================================================================
+   私有文档 AI 问答系统 · 全局样式（深蓝主题）
+   ===================================================================== */
+
+/* 覆盖 Element-Plus 主色为深蓝（#1E4E8C），各亮阶手动配置保证组件观感一致 */
+:root {
+  --el-color-primary: #1e4e8c;
+  --el-color-primary-light-3: #5b7fae;
+  --el-color-primary-light-5: #8faccd;
+  --el-color-primary-light-7: #c3d3e6;
+  --el-color-primary-light-8: #d8e3ef;
+  --el-color-primary-light-9: #edf2f8;
+  --el-color-primary-dark-2: #17395f;
+
+  /* 布局变量 */
+  --aidoc-bg: #f3f6fb;           /* 内容区背景 */
+  --aidoc-sidebar-bg: #122c52;   /* 深蓝侧边栏 */
+  --aidoc-sidebar-active: #1e4e8c;
+  --aidoc-header-bg: #ffffff;
+  --aidoc-text-main: #1f2d3d;
+  --aidoc-text-sub: #7b8ca0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', Arial, sans-serif;
+  color: var(--aidoc-text-main);
+  background: var(--aidoc-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 细滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #c3d3e6;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* 登录页深蓝渐变背景 */
+.login-page-bg {
+  background: linear-gradient(135deg, #0b2242 0%, #1e4e8c 55%, #2e6ba8 100%);
+}
+
+/* 页面卡片通用 */
+.aidoc-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(18, 44, 82, 0.06);
+  padding: 18px;
+}
+
+/* 通用页面标题 */
+.aidoc-page-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--aidoc-text-main);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+}
+.aidoc-page-title::before {
+  content: '';
+  width: 4px;
+  height: 16px;
+  border-radius: 2px;
+  background: var(--el-color-primary);
+}
+
+/* AI 消息闪烁光标 */
+.typing-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 16px;
+  margin-left: 2px;
+  vertical-align: -2px;
+  background: var(--el-color-primary);
+  animation: blink 0.9s steps(1) infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}

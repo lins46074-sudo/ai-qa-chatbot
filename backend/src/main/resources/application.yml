@@ -1,0 +1,123 @@
+# =====================================================================
+# Java RAG 私有文档 AI 问答系统 · 后端配置
+# JDK17 / SpringBoot 3.2 / MySQL8 / Redis
+#
+# 【安全约定】所有敏感项一律通过环境变量注入，本文件不得出现任何明文密钥。
+# 所需环境变量清单见项目根目录 .env.example，本地开发可复制为 .env 或
+# application-local.yml（两者均已在 .gitignore 中忽略）。
+# =====================================================================
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ai-doc-qa
+
+  # ---------- MySQL 8 数据源 ----------
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:ai_doc_qa}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:}
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      connection-timeout: 30000
+
+  # ---------- Redis ----------
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: 0
+      timeout: 5s
+      lettuce:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 0
+
+  # ---------- 文件上传 ----------
+  servlet:
+    multipart:
+      max-file-size: 20MB         # 单文件（直接上传方式的上限）
+      max-request-size: 60MB
+
+  # ---------- Jackson 序列化 ----------
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+# ---------- MyBatis-Plus ----------
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    # 开发期可打开 SQL 日志：log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    banner: false
+    db-config:
+      id-type: auto               # 主键自增
+
+# ---------- 业务配置 ----------
+aidoc:
+  jwt:
+    # HS256 签名密钥，长度必须 >= 32 字符；通过环境变量注入，禁止硬编码
+    secret: ${AIDOC_JWT_SECRET:}
+    expire-hours: 24              # token 有效期(小时)
+    header: Authorization         # 请求头名称
+    prefix: "Bearer "             # 前缀(含空格)
+
+  storage:
+    base-dir: ./data              # 文件存储根目录，含 uploads/tmp、docs 等子目录
+
+  upload:
+    chunk-size: 2097152           # 分片大小 2MB（前端约定一致）
+    max-file-mb: 200              # 允许的最大文档(MB)，超出拒绝
+
+  # ---------- 大模型（OpenAI 兼容 chat/completions） ----------
+  llm:
+    base-url: ${AIDOC_LLM_BASE_URL:https://api.deepseek.com/v1}
+    api-key: ${AIDOC_LLM_API_KEY:}          # 为空时问答接口返回友好提示
+    model: ${AIDOC_LLM_MODEL:deepseek-chat}
+    temperature: 0.3              # 采样温度(文档问答偏低保证忠实)
+    max-tokens: 2048              # 单次最大回复 token
+    connect-timeout-ms: 10000
+    read-timeout-ms: 300000       # 流式读取总超时
+
+    # ---------- 向量化（Embedding） ----------
+    # 留空 api-key 时自动降级为本地 TF-IDF 稀疏向量，无需任何外部依赖即可跑通全链路。
+    # 配置后可对接任意 OpenAI 兼容 /embeddings 接口（通义 text-embedding-v3 / 智谱 embedding-3 等）。
+    embedding:
+      base-url: ${AIDOC_EMBEDDING_BASE_URL:}
+      api-key: ${AIDOC_EMBEDDING_API_KEY:}
+      model: ${AIDOC_EMBEDDING_MODEL:text-embedding-v3}
+      dimension: 512              # 本地 TF-IDF 向量维度；API 模式由服务端决定
+
+  # ---------- RAG 检索增强 ----------
+  rag:
+    enabled: true                 # 关闭则回退为「全文注入」旧策略
+    chunk-size: 500               # 文本切片目标字符数
+    chunk-overlap: 80             # 相邻切片重叠字符数（防止切点割裂语义）
+    top-k: 4                      # 召回片段数量上限
+    score-threshold: 0.25         # 相似度阈值，低于该值的片段直接丢弃
+    merge-adjacent: true          # 相邻片段合并，减少上下文碎片
+    max-context-chars: 6000       # 送入模型的参考资料总字符上限
+    refuse-when-empty: true       # 零召回时直接拒答，不调用大模型（防幻觉）
+
+  redis-ttl:
+    context-minutes: 30           # 会话上下文缓存滑动过期(分钟)
+    doc-text-hours: 1             # 文档全文缓存过期(小时)
+    chunk-hours: 1                # 切片向量缓存过期(小时)
+    login-hours: 24               # 登录态缓存过期(小时)，须与 jwt.expire-hours 一致
+
+  init:
+    # 首次启动自动创建的内置账号，仅用于本地演示；生产环境请通过环境变量覆盖或禁用
+    admin-username: ${AIDOC_ADMIN_USERNAME:admin}
+    admin-password: ${AIDOC_ADMIN_PASSWORD:admin123}
+    demo-username: ${AIDOC_DEMO_USERNAME:demo}
+    demo-password: ${AIDOC_DEMO_PASSWORD:demo123}
+
+logging:
+  level:
+    com.aidoc: info

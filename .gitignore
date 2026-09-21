@@ -1,24 +1,81 @@
-# Compiled class file
+# ==========================================================
+# Java RAG 私有文档AI问答系统 —— Git 忽略规则
+# ==========================================================
+
+# ---------- 编译产物 ----------
+target/
+build/
+out/
 *.class
-
-# Log file
-*.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
 *.jar
 *.war
-*.nar
 *.ear
-*.zip
-*.tar.gz
-*.rar
+*.nar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
+# ---------- 构建工具 ----------
+.mvn/
+mvnw
+mvnw.cmd
+!.mvn/wrapper/maven-wrapper.jar
+
+# ---------- IDE ----------
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.project
+.classpath
+.factorypath
+*.swp
+*.swo
+*~
+
+# ---------- 日志 ----------
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ---------- 环境变量与本地配置（禁止提交任何密钥） ----------
+.env
+.env.*
+!.env.example
+application-local.yml
+application-local.yaml
+application-local.properties
+*-local.yml
+*-local.yaml
+
+# ---------- 运行时数据（上传文件 / 解析文本 / 分片临时目录） ----------
+backend/data/
+data/
+uploads/
+
+# ---------- 前端 ----------
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.vite/
+frontend/*.local
+node_modules/
+dist/
+dist-ssr/
+.vite/
+
+# TypeScript 增量编译产物（tsconfig.node.json 已将其重定向到 node_modules/.tmp）
+*.tsbuildinfo
+
+# ---------- 操作系统 ----------
+.DS_Store
+._*
+Thumbs.db
+desktop.ini
+
+# ---------- 测试与覆盖率 ----------
+.surefire/
+jacoco.exec
+*.hprof
